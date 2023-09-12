@@ -37,6 +37,8 @@ class CssCompressor(Compressor):
                 else:
                     node = self.copy(content=self.parser.elem_str(elem))
                     node.split_content.append(data)
+                    if "nonce" in elem_attribs:
+                        node.extra_context.update({"nonce": elem_attribs["nonce"]})
                     self.media_nodes.append((media, node))
         return self.split_content
 

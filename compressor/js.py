@@ -25,6 +25,8 @@ class JsCompressor(Compressor):
                 extra = " defer"
             else:
                 extra = ""
+            if "nonce" in attribs:
+                extra += f' nonce="{attribs["nonce"]}"'
             # Append to the previous node if it had the same attribute
             append_to_previous = self.extra_nodes and self.extra_nodes[-1][0] == extra
             if append_to_previous and settings.COMPRESS_ENABLED:

@@ -177,6 +177,43 @@ class TemplatetagTestCase(TestCase):
         out = '<script src="/static/CACHE/js/output.ffc39dec05fd.js"></script>'
         self.assertEqual(out, render(template, self.context, SekizaiContext))
 
+    def test_csp_nonce_file(self):
+        self.context["csp_nonce"] = "test-nonce"
+        template = """{% load compress %}{% compress js %}
+
+        <script src="{{ STATIC_URL }}js/one.js" type="text/javascript" nonce="{{ csp_nonce }}"></script>
+        {% endcompress %}{% compress css %}
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/one.css" type="text/css" nonce="{{ csp_nonce }}">
+        {% endcompress %}"""
+        out_js = '<script src="/static/CACHE/js/output.e1cc01dd11ac.js" nonce="test-nonce"></script>'
+        out_css = css_tag("/static/CACHE/css/output.5c6a60375256.css", nonce="test-nonce")
+        self.assertEqual(out_js + out_css, render(template, self.context))
+
+    def test_csp_nonce_inline(self):
+        self.context["csp_nonce"] = "test-nonce"
+
+        template = """{% load compress %}{% compress js inline %}
+        <script type="text/javascript" nonce="{{ csp_nonce }}">obj.value = "value";</script>
+        {% endcompress %}{% compress css inline %}
+        <style type="text/css" nonce="{{ csp_nonce }}">p { border:5px solid green;}</style>
+        {% endcompress %}"""
+        out_js = '<script nonce="test-nonce">obj.value="value";;</script>'
+        out_css = '<style type="text/css" nonce="test-nonce">p{border:5px solid green}</style>'
+        self.assertEqual(out_js + out_css, render(template, self.context))
+
+    def test_csp_nonce_preload(self):
+        self.context["csp_nonce"] = "test-nonce"
+
+        template = """{% load compress %}{% compress js preload %}
+
+        <script src="{{ STATIC_URL }}js/one.js" type="text/javascript" nonce="{{ csp_nonce }}"></script>
+        {% endcompress %}{% compress css preload %}
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/one.css" type="text/css" nonce="{{ csp_nonce }}">
+        {% endcompress %}"""
+        out_js = '<link rel="preload" href="/static/CACHE/js/output.e1cc01dd11ac.js" as="script" nonce="test-nonce" />'
+        out_css = '<link rel="preload" href="/static/CACHE/css/output.5c6a60375256.css" as="style" nonce="test-nonce" />'
+        self.assertEqual(out_js + out_css, render(template, self.context))
+
 
 class PrecompilerTemplatetagTestCase(TestCase):
     def setUp(self):
