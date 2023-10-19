@@ -1,1 +1,1 @@
-<style type="text/css"{% if compressed.media %} media="{{ compressed.media }}"{% endif %}>{{ compressed.content|safe }}</style>
+<style type="text/css"{% if compressed.media %} media="{{ compressed.media }}"{% endif %}{% if compressed.nonce %} nonce="{{ compressed.nonce }}"{% endif %}>{{ compressed.content|safe }}</style>

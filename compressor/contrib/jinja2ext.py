@@ -69,23 +69,26 @@ class CompressorExtension(compress.CompressorMixin, Extension):
         # endblock the templates are slightly more readable.
         parser.stream.skip_if("name:" + kindarg.value)
 
+        context_reference = nodes.ContextReference()
+
         return nodes.CallBlock(
-            self.call_method("_compress_normal", [kindarg, modearg, namearg]),
+            self.call_method("_compress_normal", [kindarg, modearg, namearg, context_reference]),
             [],
             [],
             body,
         ).set_lineno(lineno)
 
-    def _compress_forced(self, kind, mode, name, caller):
-        return self._compress(kind, mode, name, caller, True)
+    def _compress_forced(self, kind, mode, name, context, caller):
+        return self._compress(kind, mode, name, context, caller, True)
 
-    def _compress_normal(self, kind, mode, name, caller):
-        return self._compress(kind, mode, name, caller, False)
+    def _compress_normal(self, kind, mode, name, context, caller):
+        return self._compress(kind, mode, name, context, caller, False)
 
-    def _compress(self, kind, mode, name, caller, forced):
+    def _compress(self, kind, mode, name, context, caller, forced):
         mode = mode or compress.OUTPUT_FILE
         original_content = caller()
-        context = {"original_content": original_content}
+        context = context.parent
+        context["original_content"] = original_content
         return self.render_compressed(context, kind, mode, name, forced=forced)
 
     def get_original_content(self, context):

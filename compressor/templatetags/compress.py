@@ -69,10 +69,16 @@ class CompressorMixin:
         and return the result if given
         """
         original_content = self.get_original_content(context)
+        request = context.get("request", None)
+        if request is not None and hasattr(request, "csp_nonce"):
+            original_content = original_content.replace(
+                str(request.csp_nonce),
+                "__compressor_csp_nonce_placeholder__"
+            )
         key = get_offline_hexdigest(original_content)
         offline_manifest = get_offline_manifest()
         if key in offline_manifest:
-            return offline_manifest[key].replace(
+            output = offline_manifest[key].replace(
                 settings.COMPRESS_URL_PLACEHOLDER,
                 # Cast ``settings.COMPRESS_URL`` to a string to allow it to be
                 # a string-alike object to e.g. add ``SCRIPT_NAME`` WSGI param
@@ -80,6 +86,15 @@ class CompressorMixin:
                 # See https://code.djangoproject.com/ticket/25598.
                 str(settings.COMPRESS_URL),
             )
+            if "__compressor_csp_nonce_placeholder__" in output:
+                if request is None or not hasattr(request, "csp_nonce"):
+                    raise OfflineGenerationError(
+                        'The offline compression for key "%s" was generated with '
+                        "a nonce but request.csp_nonce is not available. Here "
+                        "is the original content:\n\n%s" % (key, original_content)
+                    )
+                output = output.replace('__compressor_csp_nonce_placeholder__', str(request.csp_nonce))
+            return output
         else:
             raise OfflineGenerationError(
                 "You have offline compression "

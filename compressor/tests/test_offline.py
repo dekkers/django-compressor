@@ -1,5 +1,6 @@
 import copy
 import io
+import types
 import os
 from contextlib import contextmanager
 from importlib import import_module
@@ -942,3 +943,23 @@ class OfflineCompressTestCaseWithLazyStringAlikeUrls(
 
                 self.assertEqual(actual_result, expected_result)
                 self.assertIn(str(settings.COMPRESS_URL), actual_result)
+
+
+class CspNonceTestCase(OfflineTestCaseMixin, TestCase):
+    templates_dir = "test_csp_nonce"
+    expected_hash = "822ac7501287"
+
+    def _render_script(self, hash):
+        return '<script src="{}CACHE/js/{}.{}.js" nonce="__compressor_csp_nonce_placeholder__">' "</script>".format(
+            settings.COMPRESS_URL_PLACEHOLDER, self.expected_basename, hash
+        )
+
+    def _prepare_contexts(self, engine):
+        # Create a fake request object that the compress template tag can use
+        request = types.SimpleNamespace()
+        request.csp_nonce = "__compressor_csp_nonce_placeholder__"
+        if engine == "django":
+            return [Context({'request': request})]
+        if engine == "jinja2":
+            return [{'request': request}]
+        return None

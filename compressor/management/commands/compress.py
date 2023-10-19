@@ -311,6 +311,15 @@ class Command(BaseCommand):
         for node, node_contexts in nodes.items():
             for context in node_contexts:
                 context.push()
+                # We are careful with adding the CSP nonce placeholder here
+                # because there might already be a fake request object provided
+                # in the offline context.
+                if 'request' not in context:
+                    context['request'] = {}
+                if isinstance(context['request'], dict):
+                    context['request']['csp_nonce'] = '__compressor_csp_nonce_placeholder__'
+                else:
+                    context['request'].csp_nonce = '__compressor_csp_nonce_placeholder__'
                 if not parser.process_template(template, context):
                     continue
 

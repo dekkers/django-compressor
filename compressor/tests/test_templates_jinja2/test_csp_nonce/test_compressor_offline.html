@@ -1,0 +1,8 @@
+{% spaceless %}
+
+{% compress js %}
+    <script type="text/javascript" nonce="{{ request.csp_nonce }}">
+        alert("Basic test");
+    </script>
+{% endcompress %}
+{% endspaceless %}
