@@ -2,8 +2,8 @@ import ast
 import codecs
 import os
 import sys
-from distutils.util import convert_path
 from fnmatch import fnmatchcase
+from pathlib import Path
 
 from setuptools import find_packages, setup
 
@@ -14,7 +14,7 @@ class VersionFinder(ast.NodeVisitor):
 
     def visit_Assign(self, node):
         if node.targets[0].id == "__version__":
-            self.version = node.value.s
+            self.version = node.value.value
 
 
 def read(*parts):
@@ -84,7 +84,7 @@ def find_package_data(
     """
 
     out = {}
-    stack = [(convert_path(where), "", package, only_in_packages)]
+    stack = [(str(Path(where)), "", package, only_in_packages)]
     while stack:
         where, prefix, package, only_in_packages = stack.pop(0)
         for name in os.listdir(where):
@@ -146,25 +146,26 @@ setup(
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Framework :: Django",
-        "Framework :: Django :: 3.2",
-        "Framework :: Django :: 4.0",
-        "Framework :: Django :: 4.1",
-        "Framework :: Django :: 4.2",        
+        "Framework :: Django :: 4.2",
+        "Framework :: Django :: 5.0",
+        "Framework :: Django :: 5.1",
+        "Framework :: Django :: 5.2",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3 :: Only",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Topic :: Internet :: WWW/HTTP",
     ],
     zip_safe=False,
+    python_requires=">=3.9",
     install_requires=[
+        "Django >= 4.2",
         "django-appconf >= 1.0.3",
-        "rcssmin == 1.1.1",
-        "rjsmin == 1.2.1",
+        "rcssmin == 1.1.3",
+        "rjsmin == 1.2.3",
     ],
 )

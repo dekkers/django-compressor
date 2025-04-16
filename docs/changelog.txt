@@ -1,8 +1,35 @@
 Changelog
 =========
 
-v4.4 (2023-06-28)
+UNRELEASED
+----------
+
+- Drop support for EOL Python 3.8.
+- Officially support Django 5.2
+
+v4.5.1 (2024-07-22)
 -------------------
+
+`Full list of changes from v4.5 <https://github.com/django-compressor/django-compressor/compare/4.5...4.5.1>`_
+
+- Fixed an error in v4.5 when using remote storages not defining a ``path()`` method.
+
+v4.5 (2024-05-17)
+-----------------
+
+`Full list of changes from v4.4 <https://github.com/django-compressor/django-compressor/compare/4.4...4.5>`_
+
+- Officially support Python 3.12 (requires lxml 4.9.3 or higher)
+- Drop support for Django versions before 4.2.
+- Added support for Django 5.1
+- Added new ``COMPRESS_STORAGE_ALIAS`` and ``COMPRESS_OFFLINE_MANIFEST_STORAGE_ALIAS``
+  settings. These point to keys in Django's ``storages`` handler. If set by the
+  user, Compressor will use these storages, or otherwise will set a default
+  storage, given by ``COMPRESS_STORAGE`` and
+  ``COMPRESS_OFFLINE_MANIFEST_STORAGE`` respectively on first access.
+
+v4.4 (2023-06-28)
+-----------------
 
 `Full list of changes from v4.3.1 <https://github.com/django-compressor/django-compressor/compare/4.3.1...4.4>`_
 
@@ -36,7 +63,7 @@ v4.2 (2023-01-06)
   to work properly after the v4.0 change to how duplicate file names are handled
   by `CompressorFileStorage`
 - Update rsmin and jsmin versions
-  
+
 
 v4.1 (2022-08-03)
 -----------------
@@ -59,12 +86,12 @@ v4.0 (2022-03-23)
 
 - Fix intermittent No such file or directory errors by changing strategy to
   deal with duplicate filenames in CompressorFileStorage
-  
-  Note: if your project has a custom storage backend following the example of 
+
+  Note: if your project has a custom storage backend following the example of
   `CachedS3Boto3Storage` from the "Remote Storages" documentation, it will need
   to be updated to call `save` instead of `_save` to work properly after this
   change to `CompressorFileStorage`.
-  
+
 - Deprecate SlimItFilter, stop testing it with Python 3.7 or higher
 
 
@@ -302,7 +329,7 @@ v1.3 (2013-03-18)
   -  Dropped support for Python 2.5. Removed ``any`` and ``walk`` compatibility
      functions in ``compressor.utils``.
 
-  - Removed compatibility with some old django setttings:
+  - Removed compatibility with some old django settings:
 
     - :attr:`~COMPRESS_ROOT` no longer uses ``MEDIA_ROOT`` if ``STATIC_ROOT`` is
       not defined. It expects ``STATIC_ROOT`` to be defined instead.
@@ -369,7 +396,7 @@ v1.2
   of the template context mentioned above.
 
 - Reverted an unfortunate change to the YUI filter that prepended
-  ``'java -jar'`` to the binary name, which doesn't alway work, e.g.
+  ``'java -jar'`` to the binary name, which doesn't always work, e.g.
   if the YUI compressor is shipped as a script like
   ``/usr/bin/yui-compressor``.
 
@@ -614,7 +641,7 @@ Major improvements and a lot of bugfixes, some of which are:
 - New ``compress`` management command which allows pre-running of what the
   compress template tag does.
 
-- Various performance improvements by better caching and mtime cheking.
+- Various performance improvements by better caching and mtime checking.
 
 - Deprecated ``COMPRESS_LESSC_BINARY`` setting because it's now
   superseded by the :attr:`~django.conf.settings.COMPRESS_PRECOMPILERS`
